@@ -1,7 +1,13 @@
 class ArticlesController < ApplicationController
+   
+   before_action :authenticate_user!, except: [:index, :show]
+   before_filter :log_impression, :only=> [:show]
 
-	 http_basic_authenticate_with name: "dhh", password: "secret", except: [:index, :show]
-
+def log_impression
+  @article = Article.find(params[:id])
+  # this assumes you have a current_user method in your authentication system
+  @article.impressions.create(ip_address: request.remote_ip,user_id:current_user.id)
+end
   def index
 		@articles = Article.all
 	end 
